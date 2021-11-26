@@ -10,7 +10,6 @@ def read_yml(yml_name):
         except yaml.YAMLError:
             return f'{yml_name} reading error'
 
-
 def build_url_from_filters(yml):
     # Function builds URL to apply filtering, based on the sample below
     # https://www.otomoto.pl/osobowe?
@@ -23,7 +22,7 @@ def build_url_from_filters(yml):
     prefix = 'https://www.otomoto.pl/osobowe?'
     sufix = '&search%5Badvanced_search_expanded%5D=1'
     min_price = f"search%5Bfilter_float_price%3Afrom%5D={yml['filters']['min_price']}"
-    max_price = f"search%5Bfilter_float_price%3Ato%5D={yml['filters']['max_price']}"
+    max_price = f"&search%5Bfilter_float_price%3Ato%5D={yml['filters']['max_price']}"
     seat_list = list(range(yml['filters']['min_pax'], yml['filters']['max_pax'] + 1))
     seats = [f"&search%5Bfilter_float_nr_seats%5D%5B{index}%5D={str(seatcount)}" for index,
                                                                                      seatcount in enumerate(seat_list)]
@@ -36,7 +35,7 @@ def get_html_from_url(url):
 if __name__ == "__main__":
     config_yml_object = read_yml('config.yml')
     url = build_url_from_filters(read_yml('config.yml'))
-    print("Getting content of URL")
-    html = get_html_from_url('https://www.w3schools.com/python/demopage.htm')
-    print("URL content retrieved")
-    print(html.text)
+    html = get_html_from_url(url)
+    print(url+'&search%5Border%5D=created_at%3Adesc&page=2')
+    #with open("source_code_pre_first_page.txt", "w") as f:
+     #   f.write(html.text)
