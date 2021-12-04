@@ -1,5 +1,6 @@
 import yaml
 import requests as req
+from bs4 import BeautifulSoup
 
 
 def read_yml(yml_name):
@@ -29,13 +30,34 @@ def build_url_from_filters(yml):
     url = prefix + min_price + max_price + ''.join(seats) + sufix
     return url
 
-def get_html_from_url(url):
-    return req.get(url)
+def get_full_list_of_pages(html_text):
+    url_list=[first_page_url]
+    #html = get_html_from_url(first_page_url)
+    suffix = '&search%5Border%5D=created_at%3Adesc&page='
+    soup = BeautifulSoup(html_text,'html.parser')
+    my_list = soup.find_all('span',attrs={'class':'page'})
+    print(my_list)
+    max_page = my_list[-1].text
+    print(max_page)
+
+
+    return my_list
+
+
+def get_html_text_from_url(url):
+    response = req.get(url)
+    return  response.text, response.status_code
 
 if __name__ == "__main__":
     config_yml_object = read_yml('config.yml')
-    url = build_url_from_filters(read_yml('config.yml'))
-    html = get_html_from_url(url)
-    print(url+'&search%5Border%5D=created_at%3Adesc&page=2')
-    #with open("source_code_pre_first_page.txt", "w") as f:
-     #   f.write(html.text)
+    first_page_url = build_url_from_filters(read_yml('config.yml'))
+    html_text, status = get_html_text_from_url(first_page_url)
+    print(f"Status code: {status}")
+    print(first_page_url)
+    with open("source_code_pre_first_page.txt", "w") as f:
+         f.write(html_text)
+    page_list = get_full_list_of_pages(html_text)
+    # for page in page_list:
+    #     print(page)
+    #     print(page.text)
+
